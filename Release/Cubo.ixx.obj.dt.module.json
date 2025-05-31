@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "Release\\Cubo.obj",
+            "outputs": [
+                "Release\\Cubo.ixx.obj.dt.module.json",
+                "Release\\Cubo.ixx.obj.dt.d.json"
+            ],
+            "requires": []
+        }
+    ]
+}
