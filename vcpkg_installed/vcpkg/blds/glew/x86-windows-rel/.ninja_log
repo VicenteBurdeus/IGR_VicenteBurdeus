@@ -1,0 +1,9 @@
+# ninja log v6
+7	60	7703925339540215	CMakeFiles/glew.dir/C_/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo_2/vcpkg_installed/vcpkg/blds/glew/src/glew-80f5997feb.clean/build/glew.rc.res	b66bf15d165473aa
+13	65	7703925339595388	CMakeFiles/glew_s.dir/C_/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo_2/vcpkg_installed/vcpkg/blds/glew/src/glew-80f5997feb.clean/build/glew.rc.res	4efe3c418e13071
+11	2909	7703925339570299	CMakeFiles/glew_s.dir/C_/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo_2/vcpkg_installed/vcpkg/blds/glew/src/glew-80f5997feb.clean/src/glew.c.obj	7826b2bc438fad18
+5	2937	7703925339515226	CMakeFiles/glew.dir/C_/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo_2/vcpkg_installed/vcpkg/blds/glew/src/glew-80f5997feb.clean/src/glew.c.obj	8553da4534d18806
+2910	2955	7703925368565695	lib/libglew32.lib	da41e4ae83c16cf0
+2937	3048	7703925369782132	bin/glew32.dll	2f41eda3e373d906
+2937	3048	7703925369782132	lib/glew32.lib	2f41eda3e373d906
+3048	3126	7703925369952174	CMakeFiles/install.util	890313d1076091b2

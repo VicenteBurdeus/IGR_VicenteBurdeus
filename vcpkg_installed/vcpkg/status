@@ -1,0 +1,90 @@
+Package: vcpkg-cmake-config
+Version: 2024-05-23
+Architecture: x64-windows
+Multi-Arch: same
+Abi: ea1dfd26da489c1ab0e9e89f4cac66d7b46b8b3d064a200fad1bfc69cf9a4fdf
+Status: install ok installed
+
+Package: vcpkg-cmake
+Version: 2024-04-23
+Architecture: x64-windows
+Multi-Arch: same
+Abi: ef431c76231daf51074fb1302f0be6debe2008682a5e7950b8e583a781d2624c
+Status: install ok installed
+
+Package: egl-registry
+Version: 2024-01-25
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 11d940d956d3391d2445a564d31523fdea19152c8b0668fb27b060699b357c5a
+Description: EGL API and Extension Registry
+Status: purge ok not-installed
+
+Package: opengl-registry
+Version: 2024-02-10
+Port-Version: 1
+Depends: egl-registry
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 3a58c96c5212d12c4f58394e60e8acdf5f905c49453a98f2a2057b450c4448ce
+Description: OpenGL, OpenGL ES, and OpenGL ES-SC API and Extension Registry
+Status: purge ok not-installed
+
+Package: opengl
+Version: 2022-12-04
+Port-Version: 3
+Depends: opengl-registry
+Architecture: x64-windows
+Multi-Arch: same
+Abi: e81f9635c55a35a25e9c906ad23ce34012fca47e54a74c5ff868b418b4f29767
+Description: Open Graphics Library (OpenGL)[3][4][5] is a cross-language, cross-platform application programming interface (API) for rendering 2D and 3D vector graphics.
+Status: purge ok not-installed
+
+Package: glew
+Version: 2.2.0
+Port-Version: 4
+Depends: opengl, vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 9439be23aabf724354b6833c44e7f01d9786ecf55c0a49c2a1f10027e8936ee9
+Description: The OpenGL Extension Wrangler Library (GLEW) is a cross-platform open-source C/C++ extension loading library.
+Status: purge ok not-installed
+
+Package: egl-registry
+Version: 2024-01-25
+Architecture: x86-windows
+Multi-Arch: same
+Abi: d3ba3365ed0e6997a4a2782b7fc86e30505dd403d21d7d39bc00652c9fd30cc6
+Description: EGL API and Extension Registry
+Status: install ok installed
+
+Package: opengl-registry
+Version: 2024-02-10
+Port-Version: 1
+Depends: egl-registry
+Architecture: x86-windows
+Multi-Arch: same
+Abi: f5829f46405b21769236883aff35622dc37aed698096dd4380ed2cb04652e571
+Description: OpenGL, OpenGL ES, and OpenGL ES-SC API and Extension Registry
+Status: install ok installed
+
+Package: opengl
+Version: 2022-12-04
+Port-Version: 3
+Depends: opengl-registry
+Architecture: x86-windows
+Multi-Arch: same
+Abi: 955eb7b6a6cc233315699fd68383c0d9fa576fbc9834f161f768c6786aae0945
+Description: Open Graphics Library (OpenGL)[3][4][5] is a cross-language, cross-platform application programming interface (API) for rendering 2D and 3D vector graphics.
+Status: install ok installed
+
+Package: glew
+Version: 2.2.0
+Port-Version: 4
+Depends: opengl, vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
+Architecture: x86-windows
+Multi-Arch: same
+Abi: 40e17702a62a65ec8e2067c1439175c064571489bfea8c3f5a7c3a1fc8b842f2
+Description: The OpenGL Extension Wrangler Library (GLEW) is a cross-platform open-source C/C++ extension loading library.
+Status: install ok installed
+

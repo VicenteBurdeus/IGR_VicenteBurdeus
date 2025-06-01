@@ -1,5 +1,7 @@
 #pragma once
 #include "codebase.h"
+#include "Colision.h"
+#include <vector>
 
 class Entorno {
 public:
@@ -9,8 +11,11 @@ public:
 	bool dia = true; // Indica si es de dia o de noche
 
 	Entorno(); // Constructor por defecto
-    void dibujar() const;          // Dibuja el entorno completo
+    void dibujar();          // Dibuja el entorno completo
 	void init();
+	void dibujarSueloCheckerboard(); // Dibuja el suelo con un patrón de tablero de ajedrez
+	std::vector<AABB> colisionables;
+	bool hayColision(const AABB& caja) const;
 
 private:
 	GLuint lista_suleo = 0;
@@ -27,6 +32,12 @@ private:
 
 	GLuint lista_techo = 0;
 	GLuint textura_techo = 0;
+
+	//Gestion portal
+	GLuint fboPortal = 0;
+	GLuint texturaPortal = 0;
+	const int TEX_WIDTH = 512, TEX_HEIGHT = 512;
+
 
 	GLuint create_list_Suelos(GLuint textura);         // Dibuja los suelos
 	GLuint create_list_Muros(GLuint textura);          // Dibuja los muros

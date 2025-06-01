@@ -1,0 +1,15 @@
+-- Using cached glew-2.2.0.tgz.
+-- Extracting source C:/Users/Vicente/AppData/Local/vcpkg/downloads/glew-2.2.0.tgz
+-- Applying patch fix-LNK2019.patch
+-- Applying patch base_address.patch
+-- Using source at C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/glew/src/glew-80f5997feb.clean
+-- Found external ninja('1.12.1').
+-- Configuring x86-windows-dbg
+-- Configuring x86-windows-rel
+-- Building x86-windows-dbg
+-- Building x86-windows-rel
+-- Fixing pkgconfig file: C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x86-windows/lib/pkgconfig/glew.pc
+-- Fixing pkgconfig file: C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x86-windows/debug/lib/pkgconfig/glew.pc
+-- Installing: C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x86-windows/share/glew/vcpkg-cmake-wrapper.cmake
+-- Installing: C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x86-windows/share/glew/copyright
+-- Realizando la validación posterior a la compilación

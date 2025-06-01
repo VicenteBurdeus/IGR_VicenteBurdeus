@@ -1,0 +1,8 @@
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/glew/x86-windows-dbg/CMakeFiles/glew.dir
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/glew/x86-windows-dbg/CMakeFiles/glew_s.dir
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/glew/x86-windows-dbg/CMakeFiles/uninstall.dir
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/glew/x86-windows-dbg/CMakeFiles/edit_cache.dir
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/glew/x86-windows-dbg/CMakeFiles/rebuild_cache.dir
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/glew/x86-windows-dbg/CMakeFiles/list_install_components.dir
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/glew/x86-windows-dbg/CMakeFiles/install.dir
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/glew/x86-windows-dbg/CMakeFiles/install/local.dir

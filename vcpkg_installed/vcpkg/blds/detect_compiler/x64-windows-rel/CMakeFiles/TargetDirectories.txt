@@ -1,0 +1,2 @@
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/detect_compiler/x64-windows-rel/CMakeFiles/edit_cache.dir
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/detect_compiler/x64-windows-rel/CMakeFiles/rebuild_cache.dir

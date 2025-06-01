@@ -2,6 +2,7 @@
 #define JUGADOR_H
 
 #include<codebase.h>
+#include "Entorno.h"
 
 class Jugador {
 private:
@@ -26,13 +27,18 @@ private:
     const float salto_duracion = 1.0f;
     const float salto_altura_max = 1.0f;
 
+    
+
 public:
+
+    bool noclip = false;
+
     Jugador();
 
-    void moverAdelante(float delta);
-    void moverAtras(float delta);
-    void moverDerecha(float delta);
-    void moverIzquierda(float delta);
+    void moverAdelante(float delta, const Entorno& entorno);
+    void moverAtras(float delta, const Entorno& entorno);
+    void moverDerecha(float delta, const Entorno& entorno);
+    void moverIzquierda(float delta, const Entorno& entorno);
 
     void transportar(float x, float y, float z);
     void transportar(float x, float y, float z, float nuevoYaw, float nuevoPitch);
@@ -41,8 +47,12 @@ public:
     void inclinarIzquierda();
     void inclinarDerecha();
 
-    float getRollRadians() const;
-    float getYawRadians() const;
+    float getRoll() const;
+    float getYaw() const;
+	float getPitch() const;
+
+    float getSpeed() const;
+
 
     float getX() const;
     float getY() const;
@@ -58,6 +68,11 @@ public:
 	void iniciarSalto();
     void actualizarSalto(float deltaTime);
 
+    void intentarMover(float dx, float dz, float delta, const Entorno& entorno);
+
+    AABB getAABB() const;
+
+	
 
 private:
     static float radians(float grados);

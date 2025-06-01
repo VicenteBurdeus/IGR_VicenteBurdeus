@@ -1,0 +1,11 @@
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x86-windows/debug/lib/glew32d.lib
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x86-windows/debug/bin/glew32d.dll
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x86-windows/debug/lib/pkgconfig/glew.pc
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x86-windows/debug/lib/glew32d.pdb
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x86-windows/debug/include/GL/wglew.h
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x86-windows/debug/include/GL/glew.h
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x86-windows/debug/include/GL/glxew.h
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x86-windows/debug/lib/cmake/glew/glew-targets.cmake
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x86-windows/debug/lib/cmake/glew/glew-targets-debug.cmake
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x86-windows/debug/lib/cmake/glew/glew-config.cmake
+C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x86-windows/debug/lib/cmake/glew/CopyImportedTargetProperties.cmake

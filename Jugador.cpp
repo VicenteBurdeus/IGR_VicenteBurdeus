@@ -1,32 +1,93 @@
 #include "Jugador.h"
 #include <cmath>
-#include <GL/gl.h>    // para glRotatef
-#include <GL/glu.h>   // para gluLookAt
+
+using namespace cb;
 
 Jugador::Jugador()
-    : posX(0), posY(1.7f), posZ(0), yaw(0), pitch(0), roll(0), velocidad(1.0f), velocidadInclinacion(0.0f){
-    
+    : posX(0), posY(1.7f), posZ(0), yaw(0), pitch(0), roll(0), velocidad(1.0f), velocidadInclinacion(0.0f){ 
 }
 
-void Jugador::moverAdelante(float delta) {
-    posX += delta * velocidad * sinf(radians(yaw));
-    posZ += delta * velocidad * cosf(radians(yaw));
+
+AABB Jugador::getAABB() const {
+    const float radio = 0.3f;
+    return {
+        Vec3(posX - radio, posY,     posZ - radio),
+        Vec3(posX + radio, posY + 1.7f, posZ + radio)
+    };
 }
 
-void Jugador::moverAtras(float delta) {
-    moverAdelante(-delta);
+void Jugador::intentarMover(float dx, float dz, float delta, const Entorno& entorno) {
+    float nuevoX = posX + dx * delta * velocidad;
+    float nuevoZ = posZ + dz * delta * velocidad;
+
+	if (noclip) {
+		// Modo noclip, simplemente actualizar posición
+		posX = nuevoX;
+		posZ = nuevoZ;
+		return;
+	}
+
+    AABB nuevaBox = {
+        Vec3(nuevoX - 0.3f, posY, nuevoZ - 0.3f),
+        Vec3(nuevoX + 0.3f, posY + 1.7f, nuevoZ + 0.3f)
+    };
+
+    if (!entorno.hayColision(nuevaBox)) {
+        // Movimiento sin colisión, actualizar posición
+        posX = nuevoX;
+        posZ = nuevoZ;
+        return;
+    }
+
+    // Intentar mover solo en X
+    nuevoX = posX + dx * delta * velocidad;
+    nuevoZ = posZ;  // sin cambio en Z
+
+    AABB boxX = {
+        Vec3(nuevoX - 0.3f, posY, nuevoZ - 0.3f),
+        Vec3(nuevoX + 0.3f, posY + 1.7f, nuevoZ + 0.3f)
+    };
+
+    if (!entorno.hayColision(boxX)) {
+        posX = nuevoX;
+        return;
+    }
+
+    // Intentar mover solo en Z
+    nuevoX = posX;  // sin cambio en X
+    nuevoZ = posZ + dz * delta * velocidad;
+
+    AABB boxZ = {
+        Vec3(nuevoX - 0.3f, posY, nuevoZ - 0.3f),
+        Vec3(nuevoX + 0.3f, posY + 1.7f, nuevoZ + 0.3f)
+    };
+
+    if (!entorno.hayColision(boxZ)) {
+        posZ = nuevoZ;
+    }
+
+    // Si llegamos aquí, colisiona en todos los intentos y no se mueve.
 }
 
-void Jugador::moverDerecha(float delta) {
-    float rad = radians(yaw - 90); // 90° a la izquierda del yaw
-    posX += delta * velocidad * sinf(rad);
-    posZ += delta * velocidad * cosf(rad);
+
+void Jugador::moverAdelante(float delta, const Entorno& entorno) {
+    float dx = sinf(radians(yaw));
+    float dz = cosf(radians(yaw));
+    intentarMover(dx, dz, delta, entorno);
 }
 
-void Jugador::moverIzquierda(float delta) {
-    float rad = radians(yaw + 90); // 90° a la derecha del yaw
-    posX += delta * velocidad * sinf(rad);
-    posZ += delta * velocidad * cosf(rad);
+void Jugador::moverAtras(float delta, const Entorno& entorno) {
+    moverAdelante(-delta, entorno);
+}
+
+void Jugador::moverDerecha(float delta, const Entorno& entorno) {
+    float rad = radians(yaw - 90);
+    intentarMover(sinf(rad), cosf(rad), delta, entorno);
+}
+
+void Jugador::moverIzquierda(float delta, const Entorno& entorno) {
+    float rad = radians(yaw + 90);
+    intentarMover(sinf(rad), cosf(rad), delta, entorno);
 }
 
 
@@ -72,12 +133,20 @@ void Jugador::inclinarDerecha() {
 }
 
 
-float Jugador::getRollRadians() const {
-    return radians(roll);
+float Jugador::getRoll() const {
+    return roll;
 }
 
-float Jugador::getYawRadians() const {
-    return radians(yaw);
+float Jugador::getYaw() const {
+    return yaw;
+}
+
+float Jugador::getPitch() const {
+	return pitch;
+}
+
+float Jugador::getSpeed() const {
+	return velocidad;
 }
 
 float Jugador::getX() const { return posX; }

@@ -1,0 +1,3 @@
+Checking patch build/cmake/CMakeLists.txt...
+Hunk #1 succeeded at 115 (offset -28 lines).
+Applied patch build/cmake/CMakeLists.txt cleanly.
