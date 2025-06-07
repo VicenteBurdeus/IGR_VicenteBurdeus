@@ -59,7 +59,7 @@ using namespace std::chrono;
 static enum {gameplay, debug} mapa;
 static bool InformacionHud = false;
 
-const float FPS = 60; //cantidad de Frames por segundo
+const float FPS = 1000; //cantidad de Frames por segundo
 static float tiempo_transcurrido = 0.0f;//Tiempo transcurrido desde el ultimo frame
 int frames = 0;
 float fps_real = 0.0f;
@@ -119,8 +119,39 @@ void init()
 	//glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	// Configuracion del motor de render 
-	glClearColor(0.0f, 0.0f, 0.3f, 1.0f);
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, GRISOSCURO);
+
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, GRISOSCURO);
+
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, GRISCLARO);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, GRISCLARO);
+
+	glLightfv(GL_LIGHT2, GL_DIFFUSE, GRISCLARO);
+	glLightfv(GL_LIGHT2, GL_SPECULAR, GRISCLARO);
+
+	// Material -----------------------------
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, BRONCE);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, ORO);
+	glMaterialf(GL_FRONT, GL_SHININESS, 40);
+
+	// Configurar el motor de render 
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_NORMALIZE);
+	glEnable(GL_LIGHT0);
+	GLfloat L1P[]{ -20,20,20,1 };
+	glLightfv(GL_LIGHT1, GL_POSITION, L1P);
+
+	GLfloat mat_diffuse[] = { 0.8f, 0.5f, 0.2f, 1.0f };  // Color difuso
+	GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f }; // Reflejo
+	GLfloat mat_shininess[] = { 50.0f };                // Brillo
+
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+	glEnable(GL_COLOR_MATERIAL);  // Para que el color afecte al material
 }
 
 // Render en backbuffer 
@@ -159,11 +190,8 @@ void display()
 	// En caso de flujo normal
 	entorno.dibujar();
 	
-
-
-
-
-	FinDibujo:
+FinDibujo:
+	jugador.renderizarPersonaje();
 	showInfo(InformacionHud);
 
 	glutSwapBuffers();
@@ -224,7 +252,6 @@ void tecladoDown(unsigned char key, int x, int y) {
 	key = tolower(key);
 	teclas_presionadas[key] = true;
 }
-
 void tecladoUp(unsigned char key, int x, int y) {
 	key = tolower(key);
 	teclas_presionadas[key] = false;
@@ -245,19 +272,30 @@ static void showInfo(bool enable) {
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	int windowHeight = viewport[3];
 
+	GLfloat pos[4];
+	GLfloat dir[3];
+	glGetLightfv(GL_LIGHT0, GL_POSITION, pos);
+	glGetLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, dir);
+
 	// Convertir FPS a entero para que no tenga decimales
 	string fps_str = "FPS: " + to_string((int)fps_real);
 	string pos_str = "Posicion: (" + to_string(jugador.getX()) + ", " + to_string(jugador.getY()) + ", " + to_string(jugador.getZ()) + ")";
 	string vel_str = "Velocidad: " + to_string(jugador.getSpeed());
+	string caminfo = "Camara: " + string(jugador.tercera_persona ? "Tercera persona" : "Primera persona");
 	string mapa_str = "Mapa: " + string(mapa == gameplay ? "Camara de los secretos" : "Debug");
 	string info_str = "Colisones: " + string(jugador.noclip ? "OFF" : "ON");
-
+	string info_casco = "Luz: " + string(glIsEnabled(GL_LIGHT0) ? "ON" : "OFF") +
+		" | Pos: (" + to_string(pos[0]) + ", " + to_string(pos[1]) + ", " + to_string(pos[2]) + ", " + to_string(pos[3]) + ")" +
+		" | Dir: (" + to_string(dir[0]) + ", " + to_string(dir[1]) + ", " + to_string(dir[2]) + ")";
+	
 	// Dibuja el texto en coordenadas de ventana, ajustando Y para que sea desde arriba (por ejemplo, 10 píxeles desde arriba)
 	cb::texto(10, windowHeight - 20, fps_str.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
 	cb::texto(10, windowHeight - 40, pos_str.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
 	cb::texto(10, windowHeight - 60, vel_str.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
-	cb::texto(10, windowHeight - 80, mapa_str.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
-	cb::texto(10, windowHeight - 100, info_str.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
+	cb::texto(10, windowHeight - 80, caminfo.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
+	cb::texto(10, windowHeight - 100, mapa_str.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
+	cb::texto(10, windowHeight - 120, info_str.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
+	cb::texto(10, windowHeight - 140, info_casco.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
 	showEjes();
 	glPopAttrib();
 
@@ -357,7 +395,6 @@ void myEntryFunc(int state) {
 
 void onTimer(int tiempo)
 {
-	//glutTimerFunc(1000 / tasaFPS, onTimer, 1000 / tasaFPS);
 	glutTimerFunc(tiempo, onTimer, tiempo);
 	update();
 }
@@ -434,6 +471,11 @@ void update()
 			jugador.noclip = !jugador.noclip; // Alterna el modo noclip
 		}
 	}
+	if (teclas_presionadas['t'] || teclas_presionadas['T']) {
+		if (!teclas_presionadas_previas['t']) {
+			jugador.togleLight();
+		}
+	}
 	if (teclas_especiales[GLUT_KEY_F11]) {
 		if (!teclas_especiales_previas[GLUT_KEY_F11]) {
 			if (glutGet(GLUT_FULL_SCREEN)) {
@@ -445,6 +487,11 @@ void update()
 				glutFullScreen();
 				glutSetCursor(GLUT_CURSOR_NONE);
 			}
+		}
+	}
+	if (teclas_especiales[GLUT_KEY_F5]) {
+		if (!teclas_especiales_previas[GLUT_KEY_F5]) {
+			jugador.toggleTerceraPersona();
 		}
 	}
 	if (teclas_presionadas[27]) { // ESC para salir
@@ -460,6 +507,13 @@ void update()
 	jugador.actualizarInclinacion(tiempo_transcurrido);
 	jugador.actualizarSalto(tiempo_transcurrido);
 	jugador.actualizarAgacharse(tiempo_transcurrido);
+	jugador.updateLight();
+	
+
+	//Luces
+	
+
 
 	glutPostRedisplay();
 }
+//--Luces----------------------------------------------

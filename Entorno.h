@@ -2,6 +2,7 @@
 #include "codebase.h"
 #include "Colision.h"
 #include <vector>
+#include <utility>
 
 class Entorno {
 public:
@@ -16,6 +17,8 @@ public:
 	void dibujarSueloCheckerboard(); // Dibuja el suelo con un patrón de tablero de ajedrez
 	std::vector<AABB> colisionables;
 	bool hayColision(const AABB& caja) const;
+	cb::Vec3 pasapuertas(const AABB caja) const;
+	
 
 private:
 	GLuint lista_suleo = 0;
@@ -34,10 +37,14 @@ private:
 	GLuint textura_techo = 0;
 
 	//Gestion portal
-	GLuint fboPortal = 0;
-	GLuint texturaPortal = 0;
-	const int TEX_WIDTH = 512, TEX_HEIGHT = 512;
+	bool colisionables_generados = false;
+	struct portal{
+		AABB caja; // AABB del portal
+		cb::Vec3 salida; // Posición de salida del portal
+	};
+	std::vector<portal> portales;
 
+	
 
 	GLuint create_list_Suelos(GLuint textura);         // Dibuja los suelos
 	GLuint create_list_Muros(GLuint textura);          // Dibuja los muros

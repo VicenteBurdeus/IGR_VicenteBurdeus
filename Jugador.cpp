@@ -1,11 +1,28 @@
-#include "Jugador.h"
+﻿#include "Jugador.h"
 #include <cmath>
 
 using namespace cb;
 
 Jugador::Jugador()
-    : posX(0), posY(1.7f), posZ(0), yaw(0), pitch(0), roll(0), velocidad(1.0f), velocidadInclinacion(0.0f){ 
+    : posX(0), posY(1.8f), posZ(0), yaw(0), pitch(0), roll(0), velocidad(1.0f), velocidadInclinacion(0.0f){ 
+	// Inicialización de variables
+    glEnable(GL_LIGHT0);
+
+    GLfloat ambient[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    GLfloat diffuse[] = { 1.0f, 1.0f, 0.8f, 1.0f }; // luz cálida
+    GLfloat specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+
+    glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 10.0f);       // ángulo del cono de luz
+    glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 10.0f);     // concentración del haz
+	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.10f); // atenuación constante
+	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.01f); // atenuación lineal
+	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.001f); // atenuación cuadrática
 }
+
 
 
 AABB Jugador::getAABB() const {
@@ -21,7 +38,7 @@ void Jugador::intentarMover(float dx, float dz, float delta, const Entorno& ento
     float nuevoZ = posZ + dz * delta * velocidad;
 
 	if (noclip) {
-		// Modo noclip, simplemente actualizar posici�n
+		// Modo noclip, simplemente actualizar posición
 		posX = nuevoX;
 		posZ = nuevoZ;
 		return;
@@ -32,8 +49,16 @@ void Jugador::intentarMover(float dx, float dz, float delta, const Entorno& ento
         Vec3(nuevoX + 0.3f, posY + 1.7f, nuevoZ + 0.3f)
     };
 
+    Vec3 aux = entorno.pasapuertas(nuevaBox);
+    if (aux.x != 0 || aux.y != 0 || aux.z != 0) {
+		posX = nuevoX + aux.x;
+		posZ = nuevoZ + aux.z;
+		return;
+    }
+    
+
     if (!entorno.hayColision(nuevaBox)) {
-        // Movimiento sin colisi�n, actualizar posici�n
+        // Movimiento sin colisión, actualizar posición
         posX = nuevoX;
         posZ = nuevoZ;
         return;
@@ -66,9 +91,23 @@ void Jugador::intentarMover(float dx, float dz, float delta, const Entorno& ento
         posZ = nuevoZ;
     }
 
-    // Si llegamos aqu�, colisiona en todos los intentos y no se mueve.
+    // Si llegamos aquí, colisiona en todos los intentos y no se mueve.
+    
 }
 
+void Jugador::renderizarPersonaje() {
+    if (!tercera_persona) { return; }
+	glPushMatrix();
+	glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT | GL_LIGHTING_BIT);
+	glTranslatef(posX, posY-1.3f, posZ);
+	glRotatef(yaw - 90, 0, 1, 0);
+	//glRotatef(, 1, 0, 0);
+	glRotatef(roll, 0, 0, 1);
+	glColor3f(0.0f, 1.0f, 0.0f); // Color verde
+    glutSolidTeapot(0.5f);
+	glPopMatrix();
+	glPopAttrib();
+}
 
 void Jugador::moverAdelante(float delta, const Entorno& entorno) {
     float dx = sinf(radians(yaw));
@@ -101,6 +140,12 @@ void Jugador::transportar(float x, float y, float z, float nuevoYaw, float nuevo
     posZ = z;
     yaw = nuevoYaw;
     pitch = nuevoPitch;
+}
+
+void Jugador::addPosicion(cb::Vec3 pos) {
+	posX += pos.x;
+	posY += pos.y;
+	posZ += pos.z;
 }
 
 void Jugador::girar(float vertical,float horizontal) {
@@ -155,19 +200,63 @@ float Jugador::getZ() const { return posZ; }
 
 void Jugador::addVelocidad(float delta) {
 	velocidad += delta;
-	if (velocidad < 0.1f) velocidad = 0.1f; // Velocidad m�nima
-	if (velocidad > 10.0f) velocidad = 10.0f; // Velocidad m�xima
+	if (velocidad < 0.1f) velocidad = 0.1f; // Velocidad mínima
+	if (velocidad > 10.0f) velocidad = 10.0f; // Velocidad máxima
+}
+
+#include <GL/glu.h>
+#include <cmath>
+
+inline float radians(float grados) {
+    return grados * 3.14159265f / 180.0f;
 }
 
 void Jugador::aplicarCamara() const {
-    float dirX = sinf(radians(yaw)) * cosf(radians(pitch));
-    float dirY = sinf(radians(pitch));
-    float dirZ = cosf(radians(yaw)) * cosf(radians(pitch));
+    // Calcular dirección de mirada
+    float yawRad = radians(yaw);
+    float pitchRad = radians(pitch);
 
-    glRotatef(roll, 0, 0, 1);
-    gluLookAt(posX, posY, posZ,
-              posX + dirX, posY + dirY, posZ + dirZ,
-              0, 1, 0);
+    float dirX = cosf(pitchRad) * sinf(yawRad);
+    float dirY = sinf(pitchRad);
+    float dirZ = cosf(pitchRad) * cosf(yawRad);
+
+    // Ajustes de cámara
+    float distancia = 4.0f;       // más lejos para ver bien al personaje
+    float alturaExtra = 0.0f;     // para ver desde arriba un poco
+	
+    // Variables compartidas
+    float camX, camY, camZ;
+    float lookAtX, lookAtY, lookAtZ;
+
+    if (tercera_persona) {
+        float distancia = 4.0f;
+        float alturaExtra = 0.0f;
+
+        // Cámara detrás del personaje
+        camX = posX - dirX * distancia;
+        camY = posY - dirY * distancia + alturaExtra;
+        camZ = posZ - dirZ * distancia;
+    }
+    else {
+        // Cámara en primera persona (POV)
+        camX = posX;
+        camY = posY;
+        camZ = posZ;
+
+        glRotatef(roll, 0, 0, 1); // opcional
+    }
+
+    // Hacia dónde mira (siempre igual)
+    lookAtX = posX + dirX;
+    lookAtY = posY + dirY;
+    lookAtZ = posZ + dirZ;
+
+    gluLookAt(
+        camX, camY, camZ,
+        lookAtX, lookAtY, lookAtZ,
+        0.0f, 1.0f, 0.0f
+    );
+
 }
 
 
@@ -195,7 +284,7 @@ void Jugador::toggleAgacharse() {
 }
 
 void Jugador::actualizarAgacharse(float deltaTime) {
-    // Solo actualiza si a�n no estamos en la altura objetivo
+    // Solo actualiza si aún no estamos en la altura objetivo
     if (fabs(posY - altura_objetivo) > 0.01f) {
         float direccion = (altura_objetivo > posY) ? 1.0f : -1.0f;
         posY += direccion * velocidad_agachar * deltaTime;
@@ -227,9 +316,42 @@ void Jugador::actualizarSalto(float deltaTime) {
         return;
     }
 
-    // Movimiento parab�lico simple: y = -4h * (t/T - 0.5)^2 + h
+    // Movimiento parabólico simple: y = -4h * (t/T - 0.5)^2 + h
     float t = salto_tiempo / salto_duracion;
     float altura_salto = -4.0f * salto_altura_max * (t - 0.5f) * (t - 0.5f) + salto_altura_max;
 
     posY = (agachado ? altura_agachado : altura_normal) + altura_salto;
+}
+
+void Jugador::togleLight() {
+	if (glIsEnabled(GL_LIGHT0)) {
+		glDisable(GL_LIGHT0);
+	}
+    else {
+        glEnable(GL_LIGHT0);
+    }
+}
+
+void Jugador::updateLight() {
+    GLfloat position[] = { posX, posY + 0.2f, posZ, 1.0f }; // Un poco más alto: la frente
+    glLightfv(GL_LIGHT0, GL_POSITION, position);
+
+    float yawRad = radians(yaw);
+    float pitchRad = radians(pitch);
+    GLfloat direction[3];
+    if (tercera_persona) {
+        direction[0] = cosf(pitchRad) * sinf(yawRad);
+        direction[1] = 0.0f;
+        direction[2] = -cosf(pitchRad) * cosf(yawRad);
+    }
+    else {
+        direction[0] = cosf(pitchRad) * sinf(yawRad);
+        direction[1] = -sinf(pitchRad);
+        direction[2] = -cosf(pitchRad) * cosf(yawRad);
+    }
+    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, direction);
+}
+
+void Jugador::toggleTerceraPersona(){
+	tercera_persona = !tercera_persona;
 }

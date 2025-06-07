@@ -25,6 +25,7 @@
     <ClCompile Include="rubik.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Circulos.h" />
     <ClInclude Include="Colision.h" />
     <ClInclude Include="Entorno.h" />
     <ClInclude Include="Jugador.h" />

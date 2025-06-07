@@ -27,11 +27,10 @@ private:
     const float salto_duracion = 1.0f;
     const float salto_altura_max = 1.0f;
 
-    
-
 public:
 
     bool noclip = false;
+    bool tercera_persona = false;
 
     Jugador();
 
@@ -42,6 +41,8 @@ public:
 
     void transportar(float x, float y, float z);
     void transportar(float x, float y, float z, float nuevoYaw, float nuevoPitch);
+	void addPosicion(cb::Vec3 pos);
+
 
     void girar(float grados, float horizontal);
     void inclinarIzquierda();
@@ -72,7 +73,12 @@ public:
 
     AABB getAABB() const;
 
-	
+	void togleLight();
+	void updateLight();
+
+	void toggleTerceraPersona();
+
+	void renderizarPersonaje();
 
 private:
     static float radians(float grados);
