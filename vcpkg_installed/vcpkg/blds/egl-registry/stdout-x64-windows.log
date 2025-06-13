@@ -1,0 +1,6 @@
+-- Using cached KhronosGroup-EGL-Registry-7db3005d4c2cb439f129a0adc931f3274f9019e6.tar.gz.
+-- Cleaning sources at C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/egl-registry/src/274f9019e6-49d6bdb34a.clean. Use --editable to skip cleaning for the packages you specify.
+-- Extracting source C:/Users/Vicente/AppData/Local/vcpkg/downloads/KhronosGroup-EGL-Registry-7db3005d4c2cb439f129a0adc931f3274f9019e6.tar.gz
+-- Using source at C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/egl-registry/src/274f9019e6-49d6bdb34a.clean
+-- Installing: C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/egl-registry_x64-windows/share/egl-registry/copyright
+-- Performing post-build validation

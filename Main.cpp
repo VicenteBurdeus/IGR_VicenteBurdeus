@@ -1,4 +1,4 @@
-#if 0
+Ôªø#if 0
 * ***************************************************
 Rubik.cpp
 
@@ -9,8 +9,8 @@ Segundo proyecto de la asignatura de IGR
 
 ****************************************************
 
-La base de este proyecto est· tomada del ejemplo de interacciÛn(y otras pr·cticas)
-de la asignatura de Inform·tica Gr·fica de la ETSINF / UPV.
+La base de este proyecto est√° tomada del ejemplo de interacci√≥n(y otras pr√°cticas)
+de la asignatura de Inform√°tica Gr√°fica de la ETSINF / UPV.
 
 //    _____ __  __ _____   ____  _____ _______       _   _ _______ ______ 
 //   |_   _|  \/  |  __ \ / __ \|  __ |__   __|/\   | \ | |__   __|  ____|
@@ -20,17 +20,17 @@ de la asignatura de Inform·tica Gr·fica de la ETSINF / UPV.
 //   |_____|_|  |_|_|     \____/|_|  \_\ |_/_/    \_|_| \_|  |_|  |______|
 //                                                                        
 
-Se ha usado como referencia para el desarrollo de este proyecto el cÛdigo
-de conanwu777. Aunque no se ha usado su cÛdigo directamente, algunas funciones
+Se ha usado como referencia para el desarrollo de este proyecto el c√≥digo
+de conanwu777. Aunque no se ha usado su c√≥digo directamente, algunas funciones
 del mismo han sido modificadas y utilizadas en este proyecto :
 https://github.com/conanwu777/rubik?tab=readme-ov-file
 
 Asimismo, se han utilizado IAs(GitHub Copilot) durante el desarrollo
-del proyecto, especialmente en la generaciÛn de comentarios.
+del proyecto, especialmente en la generaci√≥n de comentarios.
 
-El cÛdigo de codebase.h ha sido modificado para poder ser incluido m˙ltiples veces.
-Se aÒadiÛ la palabra clave `inline` a la declaraciÛn de cada funciÛn,
-permitiendo asÌ la "multiinstancia" y solucionando los errores de compilaciÛn.
+El c√≥digo de codebase.h ha sido modificado para poder ser incluido m√∫ltiples veces.
+Se a√±adi√≥ la palabra clave `inline` a la declaraci√≥n de cada funci√≥n,
+permitiendo as√≠ la "multiinstancia" y solucionando los errores de compilaci√≥n.
 
 En la entrega se ha adjuntado el codebase.h modificado para que sea posible compilarlo una vez entregado.
 
@@ -42,12 +42,17 @@ En la entrega se ha adjuntado el codebase.h modificado para que sea posible comp
 #include <chrono>
 #include <codebase.h>
 #include <GLFW/glfw3.h>
+#include <al.h>
+#include <alc.h>
+#include <fstream>
+#include <thread>
 
 
 
 #include "Entorno.h"
 #include "Jugador.h"
-
+#include "Reloj.h"
+#include "Musica.h"
 
 
 using namespace std;
@@ -67,13 +72,15 @@ float tiempo_acumulado = 0.0f;
 
 Entorno entorno;
 Jugador jugador;
+Reloj reloj = Reloj(cb::Vec3(0,1.6,0),180.0f);
+ALCdevice* device = alcOpenDevice(nullptr);
 
 // Arreglo para gestionar las teclas pulsadas
 bool teclas_presionadas[256] = { false };
 bool teclas_presionadas_previas[256] = { false };
 bool teclas_especiales[256] = { false };
 bool teclas_especiales_previas[256] = { false };
-
+bool musica_reproducida = false;
 
 
 // Declaracion de cabezeras (pueden no estar todas incluidas)
@@ -108,8 +115,11 @@ void init()
 	glutTimerFunc(1000 / FPS, onTimer, 1000 / FPS);
 
 	mapa = gameplay;
+	reproducirMusica("music\\Arkmain.wav");
+	musica_reproducida = true;
 	entorno.init();
-	jugador.transportar(0,1.8,-17);
+	jugador.transportar(0,1.8,-15);
+	reloj.init();
 
 	// Menu de popup
 	//glutCreateMenu(onMenu);
@@ -119,39 +129,50 @@ void init()
 	//glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	// Configuracion del motor de render 
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, GRISOSCURO);
-
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, GRISOSCURO);
-
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, GRISCLARO);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, GRISCLARO);
-
-	glLightfv(GL_LIGHT2, GL_DIFFUSE, GRISCLARO);
-	glLightfv(GL_LIGHT2, GL_SPECULAR, GRISCLARO);
-
-	// Material -----------------------------
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, BRONCE);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, ORO);
-	glMaterialf(GL_FRONT, GL_SHININESS, 40);
 
 	// Configurar el motor de render 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_COLOR_MATERIAL);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+
 	glEnable(GL_LIGHTING);
-	glEnable(GL_NORMALIZE);
+	glShadeModel(GL_SMOOTH);
+
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, GRISOSCURO);
+
+	// Activar una luz para el spotlight
+	glEnable(GL_LIGHT1);
+		// √Ångulo del cono del foco Foco vitrina
+		glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 75.0f);
+		glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 10.0f);
+		GLfloat luzDifusa[] = { 0.5f, 0.5f, 0.4f, 1.0f };
+		GLfloat luzEspecular[] = { 0.50f, 0.50f, 0.50f, 1.0f };
+		glLightfv(GL_LIGHT1, GL_DIFFUSE, luzDifusa);
+		glLightfv(GL_LIGHT1, GL_SPECULAR, luzEspecular);
+	//Init luz jugador
 	glEnable(GL_LIGHT0);
-	GLfloat L1P[]{ -20,20,20,1 };
-	glLightfv(GL_LIGHT1, GL_POSITION, L1P);
+	// Luz direccional del jugador	
+		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 90.0f);
+		glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 80.0f);
 
-	GLfloat mat_diffuse[] = { 0.8f, 0.5f, 0.2f, 1.0f };  // Color difuso
-	GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f }; // Reflejo
-	GLfloat mat_shininess[] = { 50.0f };                // Brillo
+	//Init Lus dia/noche
+		GLfloat colorDia[] = { 1.0f, 1.0f, 0.9f, 1.0f }; // Luz solar
+		GLfloat colorNoche[] = { 0.2f, 0.2f, 0.4f, 1.0f }; // Luz azulada de luna
 
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+		glLightfv(GL_LIGHT2, GL_DIFFUSE, colorDia);
+		glLightfv(GL_LIGHT2, GL_SPECULAR, colorDia);
+		GLfloat posicion[] = { 0.0f, 10.0f, 0.0f, 1.0f };
+		glLightfv(GL_LIGHT2, GL_POSITION, posicion);
 
-	glEnable(GL_COLOR_MATERIAL);  // Para que el color afecte al material
+	// Init FOG
+		GLfloat colorNiebla[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+		glFogi(GL_FOG_MODE, GL_LINEAR);
+		glFogfv(GL_FOG_COLOR, colorNiebla);
+		glFogf(GL_FOG_DENSITY, 0.75f);
+		glFogf(GL_FOG_START, 3.0f);
+		glFogf(GL_FOG_END, 10.0f);
+
 }
 
 // Render en backbuffer 
@@ -180,17 +201,35 @@ void display()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	
+	// Aplica la c√°mara ANTES de configurar luces
 	jugador.aplicarCamara();
+
+	// Luz foco reloj
+	GLfloat pos[] = { 0.0f, 5.0f, -4.0f, 1.0f };
+	GLfloat dir[] = { 0.0f, -1.0f, 0.75f };
+	GLfloat difusa[] = { 2.0f, 2.0f, 1.6f, 1.0f };
+	GLfloat especular[] = { 2.0f, 2.0f, 2.0f, 1.0f };
+
+	glLightfv(GL_LIGHT1, GL_POSITION, pos);
+	glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, dir);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, difusa);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, especular);
+	
+	jugador.updateLight(); // Aplica la luz del jugador
+	GLfloat posicionSol[] = { 0.0f, 10.0f, 0.0f, 1.0f };
+	glLightfv(GL_LIGHT2, GL_POSITION, posicionSol);
+	
+
+	// Resto de la escena
 	if (mapa == debug) {
 		ejes();
 		entorno.dibujarSueloCheckerboard();
-		goto FinDibujo;
 	}
-	// En caso de flujo normal
-	entorno.dibujar();
-	
-FinDibujo:
+	else {
+		entorno.dibujar();
+		reloj.Draw(tiempo_transcurrido);
+	}
+
 	jugador.renderizarPersonaje();
 	showInfo(InformacionHud);
 
@@ -226,7 +265,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(600, 600);
-	glutCreateWindow("Proyecto 2");
+	glutCreateWindow("Proyecto 2 Vicente Burdeus");
 	init();
 
 	// Registro de callbacks	
@@ -288,7 +327,7 @@ static void showInfo(bool enable) {
 		" | Pos: (" + to_string(pos[0]) + ", " + to_string(pos[1]) + ", " + to_string(pos[2]) + ", " + to_string(pos[3]) + ")" +
 		" | Dir: (" + to_string(dir[0]) + ", " + to_string(dir[1]) + ", " + to_string(dir[2]) + ")";
 	
-	// Dibuja el texto en coordenadas de ventana, ajustando Y para que sea desde arriba (por ejemplo, 10 pÌxeles desde arriba)
+	// Dibuja el texto en coordenadas de ventana, ajustando Y para que sea desde arriba (por ejemplo, 10 p√≠xeles desde arriba)
 	cb::texto(10, windowHeight - 20, fps_str.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
 	cb::texto(10, windowHeight - 40, pos_str.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
 	cb::texto(10, windowHeight - 60, vel_str.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
@@ -307,7 +346,7 @@ static void showEjes()
 	int vp[4];
 	glGetIntegerv(GL_VIEWPORT, vp);
 
-	// Define viewport pequeÒo (ej. 100x100 pÌxeles en esquina inferior izquierda)
+	// Define viewport peque√±o (ej. 100x100 p√≠xeles en esquina inferior izquierda)
 	glViewport(vp[0], vp[1], 100, 100);
 
 	glMatrixMode(GL_PROJECTION);
@@ -319,10 +358,10 @@ static void showEjes()
 	glPushMatrix();
 	glLoadIdentity();
 
-	// Posiciona c·mara mini ejes
+	// Posiciona c√°mara mini ejes
 	glTranslatef(0, 0, -5);
 
-	// Rota seg˙n ·ngulos de c·mara para que coincida la orientaciÛn
+	// Rota seg√∫n √°ngulos de c√°mara para que coincida la orientaci√≥n
 	glRotatef(jugador.getPitch(), 1, 0, 0);
 	glRotatef(jugador.getYaw(), 0, 1, 0);
 	glRotatef(jugador.getRoll(), 0, 0, 1);
@@ -338,11 +377,29 @@ static void showEjes()
 
 	glLineWidth(4.0f);
 
+	// Dibuja ejes RGB
 	glBegin(GL_LINES);
 	glColor3f(1, 0, 0); glVertex3f(0, 0, 0); glVertex3f(-2, 0, 0); // X rojo
-	glColor3f(0, 1, 0); glVertex3f(0, 0, 0); glVertex3f(0, 2, 0); // Y verde
-	glColor3f(0, 0, 1); glVertex3f(0, 0, 2); glVertex3f(0, 0, 0); // Z azul
+	glColor3f(0, 1, 0); glVertex3f(0, 0, 0); glVertex3f(0, 2, 0);  // Y verde
+	glColor3f(0, 0, 1); glVertex3f(0, 0, 2); glVertex3f(0, 0, 0);  // Z azul
 	glEnd();
+#if 0
+	// Dibuja cruceta blanca semitransparente
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glLineWidth(2.0f);
+	glBegin(GL_LINES);
+	glColor4f(1.0f, 1.0f, 1.0f, 0.5f);  // Blanco semitransparente (50%)
+	// L√≠nea horizontal
+	glVertex3f(-0.5f, 0.0f, 0.0f);
+	glVertex3f(0.5f, 0.0f, 0.0f);
+	// L√≠nea vertical
+	glVertex3f(0.0f, -0.5f, 0.0f);
+	glVertex3f(0.0f, 0.5f, 0.0f);
+	glEnd();
+#endif
+	glDisable(GL_BLEND);
 
 	// Restaurar estados
 	glDepthMask(GL_TRUE);
@@ -361,6 +418,7 @@ static void showEjes()
 	glViewport(vp[0], vp[1], vp[2], vp[3]);  // Restaurar viewport original
 }
 
+
 //--Raton-------------------------------------------------
 
 void onMouseMove(int x, int y) {
@@ -368,7 +426,7 @@ void onMouseMove(int x, int y) {
 	int cy = glutGet(GLUT_WINDOW_HEIGHT) / 2;
 
 	if (x == cx && y == cy)
-		return; // No mover la c·mara si ya est· centrado (evita bucles infinitos)
+		return; // No mover la c√°mara si ya est√° centrado (evita bucles infinitos)
 
 	float sensibilidad = 0.05f;
 	float deltaX = (x - cx) * sensibilidad;
@@ -403,8 +461,10 @@ void update()
 {
 	int tiempo_actual = glutGet(GLUT_ELAPSED_TIME);
 	static int tiempo_anterior = tiempo_actual;
-	float tiempo_transcurrido = (tiempo_actual - tiempo_anterior) / 1000.0f;
+	tiempo_transcurrido = (tiempo_actual - tiempo_anterior) / 1000.0f;
 	tiempo_anterior = tiempo_actual;
+
+	jugador.Inhora();
 
 	frames++;
 	tiempo_acumulado += tiempo_transcurrido;
@@ -418,47 +478,111 @@ void update()
 	float factorVelocidad = (teclas_especiales[GLUT_KEY_SHIFT_L] || teclas_especiales[GLUT_KEY_SHIFT_R]) ? 2.0f : 1.0f;
 	float desplazamiento = (factorVelocidad * 6 * tiempo_transcurrido);
 
+	//Camina hacia delante
 	if (teclas_presionadas['w'] || teclas_presionadas['W']) {
 		jugador.moverAdelante(desplazamiento, entorno);
 	}
+	//Camina hacia atras
 	if (teclas_presionadas['s'] || teclas_presionadas['S']) {
 		jugador.moverAdelante(-desplazamiento, entorno);
 	}
+	// Mueve a la izquierda
 	if (teclas_presionadas['a'] || teclas_presionadas['A']) {
 		jugador.moverIzquierda(desplazamiento, entorno);
 	}
+	// Mueve a la derecha
 	if (teclas_presionadas['d'] || teclas_presionadas['D']) {
 		jugador.moverIzquierda(-desplazamiento, entorno);
 	}
+	// Inclina izquierda
 	if (teclas_presionadas['q'] || teclas_presionadas['Q']) {
 		if (!teclas_presionadas_previas['q']) {
 			jugador.inclinarIzquierda();
 		}
 	}
+	// Inclina derecha
 	if (teclas_presionadas['e'] || teclas_presionadas['E']) {
 		if (!teclas_presionadas_previas['e']) {
 			jugador.inclinarDerecha();
 		}
 	}
-	if (teclas_presionadas['+']) {
+	// Ajusta la velocidad del jugador
+	if (teclas_presionadas['+'] || teclas_especiales[GLUT_KEY_UP]) {
 		jugador.addVelocidad(0.1f*60/FPS);
 	}
-	if (teclas_presionadas['-']) {
+	if (teclas_presionadas['-'] || teclas_especiales[GLUT_KEY_DOWN]) {
 		jugador.addVelocidad(-0.1f*60/FPS);
 	}
+	// Se agacha
 	if (teclas_presionadas['c'] || teclas_presionadas['C']) {
 		if (!teclas_presionadas_previas['c']) {
 			jugador.toggleAgacharse();
 		}
 	}
+	// Enciende la linterna
+	if (teclas_presionadas['t'] || teclas_presionadas['T']) {
+		if (!teclas_presionadas_previas['t']) {
+			jugador.togleLight();
+		}
+	}
+	// Alterna el modo de niebla
+	if (teclas_presionadas['n'] || teclas_presionadas['N']) {
+		if (!teclas_presionadas_previas['n']) {
+			if (glIsEnabled(GL_FOG)) {
+				glDisable(GL_FOG);
+			}
+			else {
+				glEnable(GL_FOG);
+			}
+		}
+	}
+	// Alterna el modo de iluminaci√≥n
+	if (teclas_presionadas['l'] || teclas_presionadas['L']) {
+		if (!teclas_presionadas_previas['l']) {
+			if (glIsEnabled(GL_LIGHTING)) {
+				glDisable(GL_LIGHTING);
+			}
+			else {
+				glEnable(GL_LIGHTING);
+			}
+		}
+	}
+	// Alterna la m√∫sica
+	if (teclas_presionadas['m'] || teclas_presionadas['M']) {
+		if (!teclas_presionadas_previas['m']) {
+			if (musica_reproducida){
+				detenerMusica();
+				musica_reproducida = false;
+			}
+			else {
+				reproducirMusica("music\\espreso.wav");
+				musica_reproducida = true;
+			}
+		}
+	}
+	//alternar noche/dia
+	if (teclas_presionadas['i'] || teclas_presionadas['I']) {
+		if (!teclas_presionadas_previas['i']) {
+			if (glIsEnabled(GL_LIGHT2)) {
+				glDisable(GL_LIGHT2);
+			}
+			else {
+				glEnable(GL_LIGHT2);
+			}
+		}
+	}
+	// Salta
 	if (teclas_presionadas[' ']) {
 		jugador.iniciarSalto();
 	}
-	if (teclas_especiales[GLUT_KEY_F3]) {
-		if (!teclas_especiales_previas[GLUT_KEY_F3]) {
-			InformacionHud = !InformacionHud; // Alterna la visibilidad del HUD
+
+	// Alterna colisiones
+	if (teclas_especiales[GLUT_KEY_F1]) {
+		if (!teclas_especiales_previas[GLUT_KEY_F1]) {
+			jugador.noclip = !jugador.noclip; // Alterna el modo noclip
 		}
 	}
+	// Alterna entre mapas
 	if (teclas_especiales[GLUT_KEY_F2]) {
 		if (!teclas_especiales_previas[GLUT_KEY_F2]) {
 			mapa = (mapa == gameplay) ? debug : gameplay;
@@ -466,16 +590,25 @@ void update()
 			else { jugador.noclip = true; }
 		}
 	}
-	if (teclas_especiales[GLUT_KEY_F1]) {
-		if (!teclas_especiales_previas[GLUT_KEY_F1]) {
-			jugador.noclip = !jugador.noclip; // Alterna el modo noclip
+	// Alterna la visibilidad del HUD
+	if (teclas_especiales[GLUT_KEY_F3]) {
+		if (!teclas_especiales_previas[GLUT_KEY_F3]) {
+			InformacionHud = !InformacionHud; // Alterna la visibilidad del HUD
 		}
 	}
-	if (teclas_presionadas['t'] || teclas_presionadas['T']) {
-		if (!teclas_presionadas_previas['t']) {
-			jugador.togleLight();
+	// Vacio
+	if (teclas_especiales[GLUT_KEY_F4]) {
+		if (!teclas_especiales_previas[GLUT_KEY_F4]) {
+			
 		}
 	}
+	// Alterna la tercera persona
+	if (teclas_especiales[GLUT_KEY_F5]) {
+		if (!teclas_especiales_previas[GLUT_KEY_F5]) {
+			jugador.toggleTerceraPersona();
+		}
+	}
+	// Alterna el modo pantalla completa
 	if (teclas_especiales[GLUT_KEY_F11]) {
 		if (!teclas_especiales_previas[GLUT_KEY_F11]) {
 			if (glutGet(GLUT_FULL_SCREEN)) {
@@ -489,12 +622,17 @@ void update()
 			}
 		}
 	}
-	if (teclas_especiales[GLUT_KEY_F5]) {
-		if (!teclas_especiales_previas[GLUT_KEY_F5]) {
-			jugador.toggleTerceraPersona();
-		}
+	//Gira la camara
+	if (teclas_especiales[GLUT_KEY_RIGHT]) {
+		jugador.girar(-5, 0); // Girar a la derecha
 	}
+	if (teclas_especiales[GLUT_KEY_LEFT]) {
+		jugador.girar(5, 0); // Girar a la izquierda
+	}
+
+	//Sale del juego
 	if (teclas_presionadas[27]) { // ESC para salir
+		detenerMusica();
 		exit(0);
 	}
 
@@ -516,4 +654,3 @@ void update()
 
 	glutPostRedisplay();
 }
-//--Luces----------------------------------------------

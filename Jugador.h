@@ -3,6 +3,7 @@
 
 #include<codebase.h>
 #include "Entorno.h"
+#include <utility>
 
 class Jugador {
 private:
@@ -31,6 +32,7 @@ public:
 
     bool noclip = false;
     bool tercera_persona = false;
+    
 
     Jugador();
 
@@ -79,6 +81,8 @@ public:
 	void toggleTerceraPersona();
 
 	void renderizarPersonaje();
+
+    pair<char, bool> Inhora();
 
 private:
     static float radians(float grados);

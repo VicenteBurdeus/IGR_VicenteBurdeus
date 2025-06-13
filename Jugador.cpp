@@ -1,26 +1,13 @@
 ﻿#include "Jugador.h"
 #include <cmath>
+#include <GL/glu.h>
 
 using namespace cb;
 
 Jugador::Jugador()
-    : posX(0), posY(1.8f), posZ(0), yaw(0), pitch(0), roll(0), velocidad(1.0f), velocidadInclinacion(0.0f){ 
-	// Inicialización de variables
-    glEnable(GL_LIGHT0);
-
-    GLfloat ambient[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    GLfloat diffuse[] = { 1.0f, 1.0f, 0.8f, 1.0f }; // luz cálida
-    GLfloat specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-
-    glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 10.0f);       // ángulo del cono de luz
-    glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 10.0f);     // concentración del haz
-	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.10f); // atenuación constante
-	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.01f); // atenuación lineal
-	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.001f); // atenuación cuadrática
+    : posX(0), posY(1.8f), posZ(0), 
+    yaw(0), pitch(0), roll(0), 
+    velocidad(1.0f), velocidadInclinacion(0.0f){ 
 }
 
 
@@ -32,6 +19,19 @@ AABB Jugador::getAABB() const {
         Vec3(posX + radio, posY + 1.7f, posZ + radio)
     };
 }
+
+AABB zona_reloj = {
+	Vec3(-2.5, 0.0f, 0),
+	Vec3(2.5, 2.0f, -10)
+};
+pair<char, bool> Jugador::Inhora() {
+	if (zona_reloj.colisionaCon(Jugador::getAABB()) &&
+    (yaw>270 || yaw < 90) && (pitch>-45 && pitch<45)){
+		//seguir desde aki
+    }
+	return std::make_pair('f', false);
+}
+
 
 void Jugador::intentarMover(float dx, float dz, float delta, const Entorno& entorno) {
     float nuevoX = posX + dx * delta * velocidad;
@@ -118,12 +118,10 @@ void Jugador::moverAdelante(float delta, const Entorno& entorno) {
 void Jugador::moverAtras(float delta, const Entorno& entorno) {
     moverAdelante(-delta, entorno);
 }
-
 void Jugador::moverDerecha(float delta, const Entorno& entorno) {
     float rad = radians(yaw - 90);
     intentarMover(sinf(rad), cosf(rad), delta, entorno);
 }
-
 void Jugador::moverIzquierda(float delta, const Entorno& entorno) {
     float rad = radians(yaw + 90);
     intentarMover(sinf(rad), cosf(rad), delta, entorno);
@@ -133,7 +131,6 @@ void Jugador::moverIzquierda(float delta, const Entorno& entorno) {
 void Jugador::transportar(float x, float y, float z) {
     transportar(x, y, z, yaw, pitch);
 }
-
 void Jugador::transportar(float x, float y, float z, float nuevoYaw, float nuevoPitch) {
     posX = x;
     posY = y;
@@ -141,13 +138,11 @@ void Jugador::transportar(float x, float y, float z, float nuevoYaw, float nuevo
     yaw = nuevoYaw;
     pitch = nuevoPitch;
 }
-
 void Jugador::addPosicion(cb::Vec3 pos) {
 	posX += pos.x;
 	posY += pos.y;
 	posZ += pos.z;
 }
-
 void Jugador::girar(float vertical,float horizontal) {
     yaw += vertical;
 	pitch += horizontal;
@@ -166,7 +161,6 @@ void Jugador::inclinarIzquierda() {
     }
     velocidadInclinacion = (objetivoRoll - roll) / 0.25f;
 }
-
 void Jugador::inclinarDerecha() {
     if (objetivoRoll == 10.0f) {
         objetivoRoll = 0.0f;
@@ -181,15 +175,12 @@ void Jugador::inclinarDerecha() {
 float Jugador::getRoll() const {
     return roll;
 }
-
 float Jugador::getYaw() const {
     return yaw;
 }
-
 float Jugador::getPitch() const {
 	return pitch;
 }
-
 float Jugador::getSpeed() const {
 	return velocidad;
 }
@@ -204,10 +195,8 @@ void Jugador::addVelocidad(float delta) {
 	if (velocidad > 10.0f) velocidad = 10.0f; // Velocidad máxima
 }
 
-#include <GL/glu.h>
-#include <cmath>
 
-inline float radians(float grados) {
+inline static float radians(float grados) {
     return grados * 3.14159265f / 180.0f;
 }
 
@@ -234,7 +223,7 @@ void Jugador::aplicarCamara() const {
 
         // Cámara detrás del personaje
         camX = posX - dirX * distancia;
-        camY = posY - dirY * distancia + alturaExtra;
+        camY = max(posY - dirY * distancia + alturaExtra,0);
         camZ = posZ - dirZ * distancia;
     }
     else {
@@ -258,12 +247,13 @@ void Jugador::aplicarCamara() const {
     );
 
 }
-
+void Jugador::toggleTerceraPersona() {
+    tercera_persona = !tercera_persona;
+}
 
 float Jugador::radians(float grados) {
     return grados * (3.14159265359f / 180.0f);
 }
-
 void Jugador::actualizarInclinacion(float deltaTime) {
     if (fabs(objetivoRoll - roll) > 0.01f) {
         roll += velocidadInclinacion * deltaTime;
@@ -276,13 +266,11 @@ void Jugador::actualizarInclinacion(float deltaTime) {
         }
     }
 }
-
 void Jugador::toggleAgacharse() {
     agachado = !agachado;
     altura_objetivo = agachado ? altura_agachado : altura_normal;
     velocidad = agachado ? velocidad_agachado : velocidad_normal;
 }
-
 void Jugador::actualizarAgacharse(float deltaTime) {
     // Solo actualiza si aún no estamos en la altura objetivo
     if (fabs(posY - altura_objetivo) > 0.01f) {
@@ -295,8 +283,6 @@ void Jugador::actualizarAgacharse(float deltaTime) {
         }
     }
 }
-
-
 void Jugador::iniciarSalto() {
     if (!saltando && !agachado) {
         saltando = true;
@@ -304,7 +290,6 @@ void Jugador::iniciarSalto() {
         salto_tiempo = 0.0f;
     }
 }
-
 void Jugador::actualizarSalto(float deltaTime) {
     if (!saltando) return;
 
@@ -322,7 +307,6 @@ void Jugador::actualizarSalto(float deltaTime) {
 
     posY = (agachado ? altura_agachado : altura_normal) + altura_salto;
 }
-
 void Jugador::togleLight() {
 	if (glIsEnabled(GL_LIGHT0)) {
 		glDisable(GL_LIGHT0);
@@ -333,25 +317,22 @@ void Jugador::togleLight() {
 }
 
 void Jugador::updateLight() {
-    GLfloat position[] = { posX, posY + 0.2f, posZ, 1.0f }; // Un poco más alto: la frente
-    glLightfv(GL_LIGHT0, GL_POSITION, position);
-
+    // Luz del jugadorf
     float yawRad = radians(yaw);
     float pitchRad = radians(pitch);
-    GLfloat direction[3];
-    if (tercera_persona) {
-        direction[0] = cosf(pitchRad) * sinf(yawRad);
-        direction[1] = 0.0f;
-        direction[2] = -cosf(pitchRad) * cosf(yawRad);
-    }
-    else {
-        direction[0] = cosf(pitchRad) * sinf(yawRad);
-        direction[1] = -sinf(pitchRad);
-        direction[2] = -cosf(pitchRad) * cosf(yawRad);
-    }
-    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, direction);
-}
 
-void Jugador::toggleTerceraPersona(){
-	tercera_persona = !tercera_persona;
+    GLfloat posj[] = { posX, posY+0.2f, posZ, 1.0f };
+    GLfloat dirj[] = {cosf(pitchRad) * sinf(yawRad),sinf(pitchRad),cosf(pitchRad) * cosf(yawRad)};
+	if (tercera_persona) {
+		posj[1] += 1.0f; // Ajustar altura si es tercera persona
+	} 
+    GLfloat difusaj[] = { 2.0f, 2.0f, 1.6f, 1.0f };
+    GLfloat especularj[] = { 0.6f, 0.6f, 0.6f, 1.0f };
+
+    glLightfv(GL_LIGHT0, GL_POSITION, posj);
+    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, dirj);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, difusaj);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, especularj);
+    return;
+
 }

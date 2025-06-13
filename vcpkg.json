@@ -2,6 +2,6 @@
   "name": "tu-proyecto",
   "version": "1.0.0",
   "dependencies": [
-    "glew"
+    "glew","sdl2","sdl2-mixer"
   ]
 }

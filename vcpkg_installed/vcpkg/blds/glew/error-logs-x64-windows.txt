@@ -1,0 +1,4 @@
+C:\Users\Vicente\Desktop\IGR\Practicas_GL\Trabajo 2\vcpkg_installed\vcpkg\blds\glew\config-x64-windows-dbg-CMakeCache.txt.log
+C:\Users\Vicente\Desktop\IGR\Practicas_GL\Trabajo 2\vcpkg_installed\vcpkg\blds\glew\config-x64-windows-dbg-CMakeConfigureLog.yaml.log
+C:\Users\Vicente\Desktop\IGR\Practicas_GL\Trabajo 2\vcpkg_installed\vcpkg\blds\glew\config-x64-windows-dbg-out.log
+C:\Users\Vicente\Desktop\IGR\Practicas_GL\Trabajo 2\vcpkg_installed\vcpkg\blds\glew\config-x64-windows-dbg-err.log

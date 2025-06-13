@@ -1,0 +1,24 @@
+-- Using cached glew-2.2.0.tgz.
+-- Cleaning sources at C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/glew/src/glew-80f5997feb.clean. Use --editable to skip cleaning for the packages you specify.
+-- Extracting source C:/Users/Vicente/AppData/Local/vcpkg/downloads/glew-2.2.0.tgz
+-- Applying patch fix-LNK2019.patch
+-- Applying patch base_address.patch
+-- Using source at C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/glew/src/glew-80f5997feb.clean
+-- Found external ninja('1.12.1').
+-- Configuring x64-windows-dbg
+CMake Error at scripts/cmake/vcpkg_execute_required_process.cmake:127 (message):
+    Command failed: "C:/Program Files/CMake/bin/cmake.exe" "C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/glew/src/glew-80f5997feb.clean/build/cmake" -G Ninja -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_INSTALL_PREFIX=C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/pkgs/glew_x64-windows/debug" -DFETCHCONTENT_FULLY_DISCONNECTED=ON -DBUILD_UTILS=OFF "-DCMAKE_MAKE_PROGRAM=C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -DBUILD_SHARED_LIBS=ON "-DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/scripts/toolchains/windows.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows -DVCPKG_SET_CHARSET_FLAG=ON -DVCPKG_PLATFORM_TOOLSET=v143 -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY=ON -DCMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY=ON -DCMAKE_FIND_PACKAGE_NO_SYSTEM_PACKAGE_REGISTRY=ON -DCMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP=TRUE -DCMAKE_VERBOSE_MAKEFILE=ON -DVCPKG_APPLOCAL_DEPS=OFF "-DCMAKE_TOOLCHAIN_FILE=C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/scripts/buildsystems/vcpkg.cmake" -DCMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION=ON -DVCPKG_CXX_FLAGS= -DVCPKG_CXX_FLAGS_RELEASE= -DVCPKG_CXX_FLAGS_DEBUG= -DVCPKG_C_FLAGS= -DVCPKG_C_FLAGS_RELEASE= -DVCPKG_C_FLAGS_DEBUG= -DVCPKG_CRT_LINKAGE=dynamic -DVCPKG_LINKER_FLAGS= -DVCPKG_LINKER_FLAGS_RELEASE= -DVCPKG_LINKER_FLAGS_DEBUG= -DVCPKG_TARGET_ARCHITECTURE=x64 -DCMAKE_INSTALL_LIBDIR:STRING=lib -DCMAKE_INSTALL_BINDIR:STRING=bin "-D_VCPKG_ROOT_DIR=C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg" "-D_VCPKG_INSTALLED_DIR=C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed" -DVCPKG_MANIFEST_INSTALL=OFF
+    Working Directory: C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/vcpkg/blds/glew/x64-windows-dbg
+    Error code: 1
+    See logs for more information:
+      C:\Users\Vicente\Desktop\IGR\Practicas_GL\Trabajo 2\vcpkg_installed\vcpkg\blds\glew\config-x64-windows-dbg-CMakeCache.txt.log
+      C:\Users\Vicente\Desktop\IGR\Practicas_GL\Trabajo 2\vcpkg_installed\vcpkg\blds\glew\config-x64-windows-dbg-CMakeConfigureLog.yaml.log
+      C:\Users\Vicente\Desktop\IGR\Practicas_GL\Trabajo 2\vcpkg_installed\vcpkg\blds\glew\config-x64-windows-dbg-out.log
+      C:\Users\Vicente\Desktop\IGR\Practicas_GL\Trabajo 2\vcpkg_installed\vcpkg\blds\glew\config-x64-windows-dbg-err.log
+
+Call Stack (most recent call first):
+  C:/Users/Vicente/Desktop/IGR/Practicas_GL/Trabajo 2/vcpkg_installed/x64-windows/share/vcpkg-cmake/vcpkg_cmake_configure.cmake:287 (vcpkg_execute_required_process)
+  C:/Users/Vicente/AppData/Local/vcpkg/registries/git-trees/bf42d73479dcd0f239b71dbed4d0d3af22efb294/portfile.cmake:22 (vcpkg_cmake_configure)
+  scripts/ports.cmake:196 (include)
+
+

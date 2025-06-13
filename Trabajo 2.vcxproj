@@ -20,16 +20,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entorno.cpp" />
+    <ClCompile Include="Gear.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Jugador.cpp" />
-    <ClCompile Include="rubik.cpp" />
+    <ClCompile Include="Reloj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Circulos.h" />
     <ClInclude Include="Colision.h" />
     <ClInclude Include="Entorno.h" />
+    <ClInclude Include="Gear.h" />
     <ClInclude Include="Jugador.h" />
-    <ClInclude Include="rubik.h" />
+    <ClInclude Include="Musica.h" />
+    <ClInclude Include="Reloj.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -93,13 +96,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glew-2.1.0\include;C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glfw-3.4.bin.WIN32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glew-2.1.0\include;C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glfw-3.4.bin.WIN32\include;C:\Users\Vicente\Desktop\IGR\Practicas_GL\Trabajo 2\includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glew-2.1.0\lib\Release\Win32;C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glfw-3.4.bin.WIN32\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Vicente\Desktop\IGR\Practicas_GL\Trabajo 2\openal-soft-1.24.3-bin\libs\Win32;C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glew-2.1.0\lib\Release\Win32;C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glfw-3.4.bin.WIN32\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -110,15 +114,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glew-2.1.0\include;C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glfw-3.4.bin.WIN32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glew-2.1.0\include;C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glfw-3.4.bin.WIN32\include;C:\Users\Vicente\Desktop\IGR\Practicas_GL\Trabajo 2\includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glew-2.1.0\lib\Release\Win32;C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glfw-3.4.bin.WIN32\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Vicente\Desktop\IGR\Practicas_GL\Trabajo 2\openal-soft-1.24.3-bin\libs\Win32;C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glew-2.1.0\lib\Release\Win32;C:\Users\Vicente\Desktop\IGR\Practicas_GL\Librerias\glfw-3.4.bin.WIN32\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

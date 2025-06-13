@@ -16,11 +16,11 @@ vector <cb::Vec3> puntosTecho(cb::Vec3 P1, cb::Vec3 P2, float Radio, int down=1)
 	return puntos;
 }
 
-vector<cb::Vec3> puntosCirculoTecho() {
+vector<cb::Vec3> puntosCirculoTecho(const int n = 10) {
 	cb::Vec3 centro = cb::Vec3(0, 0, -20);
 	float radio = 40.0f;
 	vector<cb::Vec3> puntos;
-	const int n = 10;
+	
 
 	float x_objetivo = 10.0f;
 	float y_objetivo = 5.0f;
