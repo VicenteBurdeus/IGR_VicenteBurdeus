@@ -28,6 +28,8 @@ private:
     const float salto_duracion = 1.0f;
     const float salto_altura_max = 1.0f;
 
+    GLuint textura_cabina = 0;
+
 public:
 
     bool noclip = false;
@@ -35,6 +37,8 @@ public:
     
 
     Jugador();
+
+	void init();
 
     void moverAdelante(float delta, const Entorno& entorno);
     void moverAtras(float delta, const Entorno& entorno);
@@ -82,7 +86,9 @@ public:
 
 	void renderizarPersonaje();
 
-    pair<char, bool> Inhora();
+    pair<char, bool> Inhora(bool *input) const;
+
+	void cabina(bool enable);
 
 private:
     static float radians(float grados);

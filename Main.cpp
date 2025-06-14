@@ -20,14 +20,6 @@ de la asignatura de Informática Gráfica de la ETSINF / UPV.
 //   |_____|_|  |_|_|     \____/|_|  \_\ |_/_/    \_|_| \_|  |_|  |______|
 //                                                                        
 
-Se ha usado como referencia para el desarrollo de este proyecto el código
-de conanwu777. Aunque no se ha usado su código directamente, algunas funciones
-del mismo han sido modificadas y utilizadas en este proyecto :
-https://github.com/conanwu777/rubik?tab=readme-ov-file
-
-Asimismo, se han utilizado IAs(GitHub Copilot) durante el desarrollo
-del proyecto, especialmente en la generación de comentarios.
-
 El código de codebase.h ha sido modificado para poder ser incluido múltiples veces.
 Se añadió la palabra clave `inline` a la declaración de cada función,
 permitiendo así la "multiinstancia" y solucionando los errores de compilación.
@@ -81,6 +73,8 @@ bool teclas_presionadas_previas[256] = { false };
 bool teclas_especiales[256] = { false };
 bool teclas_especiales_previas[256] = { false };
 bool musica_reproducida = false;
+bool cabina_on = true;
+static string hora_str = "";
 
 
 // Declaracion de cabezeras (pueden no estar todas incluidas)
@@ -118,6 +112,7 @@ void init()
 	reproducirMusica("music\\Arkmain.wav");
 	musica_reproducida = true;
 	entorno.init();
+	jugador.init();
 	jugador.transportar(0,1.8,-15);
 	reloj.init();
 
@@ -131,7 +126,8 @@ void init()
 	// Configuracion del motor de render 
 
 	// Configurar el motor de render 
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	//glClearColor(0.47f, 0.31f, 0.20f, 1.0f);//Color paredes
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
@@ -164,6 +160,7 @@ void init()
 		glLightfv(GL_LIGHT2, GL_SPECULAR, colorDia);
 		GLfloat posicion[] = { 0.0f, 10.0f, 0.0f, 1.0f };
 		glLightfv(GL_LIGHT2, GL_POSITION, posicion);
+
 
 	// Init FOG
 		GLfloat colorNiebla[] = { 0.5f, 0.5f, 0.5f, 1.0f };
@@ -203,36 +200,52 @@ void display()
 
 	// Aplica la cámara ANTES de configurar luces
 	jugador.aplicarCamara();
+	glPushMatrix();
 
-	// Luz foco reloj
-	GLfloat pos[] = { 0.0f, 5.0f, -4.0f, 1.0f };
-	GLfloat dir[] = { 0.0f, -1.0f, 0.75f };
-	GLfloat difusa[] = { 2.0f, 2.0f, 1.6f, 1.0f };
-	GLfloat especular[] = { 2.0f, 2.0f, 2.0f, 1.0f };
-
-	glLightfv(GL_LIGHT1, GL_POSITION, pos);
-	glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, dir);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, difusa);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, especular);
 	
-	jugador.updateLight(); // Aplica la luz del jugador
-	GLfloat posicionSol[] = { 0.0f, 10.0f, 0.0f, 1.0f };
-	glLightfv(GL_LIGHT2, GL_POSITION, posicionSol);
+	jugador.updateLight();
 	
-
+	
+	
 	// Resto de la escena
+	
 	if (mapa == debug) {
 		ejes();
 		entorno.dibujarSueloCheckerboard();
+		glDisable(GL_DEPTH_TEST);
+		jugador.cabina(cabina_on);
+		glDisable(GL_LIGHT1);
 	}
 	else {
 		entorno.dibujar();
+		// Luz foco reloj
+		glEnable(GL_LIGHT1);
+		GLfloat pos[] = { 0.0f, 5.0f, -4.0f, 1.0f };
+		GLfloat dir[] = { 0.0f, -1.0f, 0.75f };
+		GLfloat difusa[] = { 2.0f, 2.0f, 1.6f, 1.0f };
+		GLfloat especular[] = { 2.0f, 2.0f, 2.0f, 1.0f };
+
+		glLightfv(GL_LIGHT1, GL_POSITION, pos);
+		glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, dir);
+		glLightfv(GL_LIGHT1, GL_DIFFUSE, difusa);
+		glLightfv(GL_LIGHT1, GL_SPECULAR, especular);
+		entorno.drawFaro(tiempo_transcurrido);
 		reloj.Draw(tiempo_transcurrido);
+		
+		jugador.renderizarPersonaje();
+		glDisable(GL_DEPTH_TEST);
+		jugador.cabina(cabina_on);
+		pair<char, bool> interaccion = jugador.Inhora(teclas_presionadas);
 	}
-
-	jugador.renderizarPersonaje();
+	
+	glPushAttrib(GL_CURRENT_BIT | GL_ENABLE_BIT | GL_TEXTURE_BIT);
 	showInfo(InformacionHud);
-
+	glPopAttrib();
+	
+	glEnable(GL_DEPTH_TEST);
+	glPopMatrix();
+	
+	
 	glutSwapBuffers();
 }
 
@@ -303,13 +316,15 @@ void tecladoEspecialUp(int key, int x, int y) {teclas_especiales[key] = false;}
 
 static void showInfo(bool enable) {
 	if (!enable) { return; }
-
+	showEjes();
 	glPushAttrib(GL_CURRENT_BIT | GL_ENABLE_BIT | GL_TEXTURE_BIT);
 	glColor3f(1.0f, 1.0f, 1.0f);
 
 	int viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	int windowHeight = viewport[3];
+	// opten ancho de la pantalla
+
 
 	GLfloat pos[4];
 	GLfloat dir[3];
@@ -326,7 +341,7 @@ static void showInfo(bool enable) {
 	string info_casco = "Luz: " + string(glIsEnabled(GL_LIGHT0) ? "ON" : "OFF") +
 		" | Pos: (" + to_string(pos[0]) + ", " + to_string(pos[1]) + ", " + to_string(pos[2]) + ", " + to_string(pos[3]) + ")" +
 		" | Dir: (" + to_string(dir[0]) + ", " + to_string(dir[1]) + ", " + to_string(dir[2]) + ")";
-	
+
 	// Dibuja el texto en coordenadas de ventana, ajustando Y para que sea desde arriba (por ejemplo, 10 píxeles desde arriba)
 	cb::texto(10, windowHeight - 20, fps_str.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
 	cb::texto(10, windowHeight - 40, pos_str.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
@@ -335,9 +350,8 @@ static void showInfo(bool enable) {
 	cb::texto(10, windowHeight - 100, mapa_str.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
 	cb::texto(10, windowHeight - 120, info_str.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
 	cb::texto(10, windowHeight - 140, info_casco.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
-	showEjes();
-	glPopAttrib();
 
+	glPopAttrib();
 	
 }
 
@@ -464,8 +478,6 @@ void update()
 	tiempo_transcurrido = (tiempo_actual - tiempo_anterior) / 1000.0f;
 	tiempo_anterior = tiempo_actual;
 
-	jugador.Inhora();
-
 	frames++;
 	tiempo_acumulado += tiempo_transcurrido;
 
@@ -571,11 +583,16 @@ void update()
 			}
 		}
 	}
+	// Alterna la cabina
+	if (teclas_presionadas['v'] || teclas_presionadas['V']) {
+		if (!teclas_presionadas_previas['v']) {
+			cabina_on = !cabina_on;
+		}
+	}
 	// Salta
 	if (teclas_presionadas[' ']) {
 		jugador.iniciarSalto();
 	}
-
 	// Alterna colisiones
 	if (teclas_especiales[GLUT_KEY_F1]) {
 		if (!teclas_especiales_previas[GLUT_KEY_F1]) {

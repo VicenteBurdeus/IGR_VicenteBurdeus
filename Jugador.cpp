@@ -1,6 +1,8 @@
 ﻿#include "Jugador.h"
 #include <cmath>
 #include <GL/glu.h>
+#include <string>
+#include <chrono>
 
 using namespace cb;
 
@@ -10,7 +12,14 @@ Jugador::Jugador()
     velocidad(1.0f), velocidadInclinacion(0.0f){ 
 }
 
+void Jugador::init() {
 
+    glGenTextures(1, &textura_cabina);
+    glBindTexture(GL_TEXTURE_2D, textura_cabina);
+    loadImageFile((char*)"img\\cabina.png");
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+}
 
 AABB Jugador::getAABB() const {
     const float radio = 0.3f;
@@ -24,10 +33,52 @@ AABB zona_reloj = {
 	Vec3(-2.5, 0.0f, 0),
 	Vec3(2.5, 2.0f, -10)
 };
-pair<char, bool> Jugador::Inhora() {
+pair<char, bool> Jugador::Inhora(bool *input) const {
 	if (zona_reloj.colisionaCon(Jugador::getAABB()) &&
     (yaw>270 || yaw < 90) && (pitch>-45 && pitch<45)){
-		//seguir desde aki
+        
+        int viewport[4];
+        glGetIntegerv(GL_VIEWPORT, viewport);
+        int windowWidth =(int)viewport[2] / 2;
+        int windowHeight = (int)viewport[3]/3;
+		//printf("punto de dibujo: %d, %d\n", windowWidth, windowHeight);
+        glPushAttrib(GL_CURRENT_BIT | GL_ENABLE_BIT | GL_TEXTURE_BIT);
+        glMatrixMode(GL_PROJECTION);
+		
+        glPushMatrix();
+        glLoadIdentity();
+
+        gluOrtho2D(0, windowWidth, 0, windowHeight);  // sistema 2D
+
+        glMatrixMode(GL_MODELVIEW);;
+        glColor3f(1.0f, 1.0f, 1.0f);
+
+        string interac_str = "Pulsa F para ver la hora";
+
+		if (input && input['f']) {
+            auto ahora = std::chrono::system_clock::now();
+            auto tiempo = std::chrono::system_clock::to_time_t(ahora);
+            std::tm hora_local;
+            localtime_s(&hora_local, &tiempo); // Versión segura
+
+            int hora = hora_local.tm_hour;
+            int minuto = hora_local.tm_min;
+            int segundo = hora_local.tm_sec;
+
+            interac_str = "Son las " + std::to_string(hora) + ":" +
+                std::to_string(minuto) + ":" +
+                std::to_string(segundo) +
+                (hora >= 12 ? " PM" : " AM");
+        }
+        cb::texto(windowWidth, windowHeight, interac_str.c_str(), BLANCO, GLUT_BITMAP_HELVETICA_18, false);
+
+
+
+        glPopMatrix(); // modelview
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+
     }
 	return std::make_pair('f', false);
 }
@@ -335,4 +386,46 @@ void Jugador::updateLight() {
     glLightfv(GL_LIGHT0, GL_SPECULAR, especularj);
     return;
 
+}
+
+void Jugador::cabina(bool enable) {
+    if (!enable) { return; }
+	if (tercera_persona) { return; }
+
+    glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT | GL_TEXTURE_BIT);
+    glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    int viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, viewport[2], 0, viewport[3]);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textura_cabina);  // Esta textura debe tener canal alpha
+
+    // Dibujamos un quad del tamaño de la pantalla
+    glColor4f(1.0, 1.0, 1.0, 1.0); // Blanco total, alpha se toma de la textura
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f); glVertex2i(0, 0);
+    glTexCoord2f(1.0f, 0.0f); glVertex2i(viewport[2], 0);
+    glTexCoord2f(1.0f, 1.0f); glVertex2i(viewport[2], viewport[3]);
+    glTexCoord2f(0.0f, 1.0f); glVertex2i(0, viewport[3]);
+    glEnd();
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
+    glPopAttrib();
 }

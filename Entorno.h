@@ -19,7 +19,7 @@ public:
 	bool hayColision(const AABB& caja) const;
 	cb::Vec3 pasapuertas(const AABB caja) const;
 	
-
+	void drawFaro(int tiempo_trancurrido);
 private:
 	GLuint lista_suleo = 0;
 	GLuint textura_suelo = 0;
@@ -46,11 +46,14 @@ private:
 
 	
 
-	GLuint create_list_Suelos(GLuint textura);         // Dibuja los suelos
-	GLuint create_list_Muros(GLuint textura);          // Dibuja los muros
-	GLuint create_list_Pilares(GLuint textura);        // Dibuja los pilares
-	GLuint create_list_Puerta(GLuint textura);     // Dibuja las puertas
-	GLuint create_list_Techo(GLuint textura);          // Dibuja el techo
-    // Otros elementos como muros, texturas, etc.
+	GLuint create_list_Suelos(GLuint textura);          // Dibuja los suelos
+	GLuint create_list_Muros(GLuint textura);           // Dibuja los muros
+	GLuint create_list_Pilares(GLuint textura);         // Dibuja los pilares
+	GLuint create_list_Puerta(GLuint textura);			// Dibuja las puertas
+	GLuint create_list_Techo(GLuint textura);           // Dibuja el techo
+    
+	
+	void drawcilindro(cb::Vec3 pos_base, GLfloat rad, GLfloat rad_2, GLfloat altura, GLuint texture);
+	
 };
  

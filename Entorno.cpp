@@ -1,11 +1,16 @@
-#include "Entorno.h"
+﻿#include "Entorno.h"
 #include <stdint.h>
 #include <iostream>
 #include <GL/glcorearb.h>
+#include <GL/GLU.h>
 #include <vector>
+#include <cmath>
+
 
 #include "codebase.h"
 #include "Circulos.h"
+#include <chrono>
+
 
 using namespace std;
 using namespace cb;
@@ -30,7 +35,7 @@ void Entorno::init() {
 	loadImageFile((char*)"img\\muro.jpg");
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-#if 0 
+#if 1
 	glGenTextures(1, &textura_pilar);
 	glBindTexture(GL_TEXTURE_2D, textura_pilar);
 	loadImageFile((char*)"img\\pilar.jpg");
@@ -165,8 +170,8 @@ GLuint Entorno::create_list_Suelos(GLuint textura) {
 	GLfloat v2[3] = { 10, 0,  20 };
 	GLfloat v1[3] = { -10, 0,  20 };
 
-	// Aqu� dibujamos el suelo usando la funci�n quadtex,
-	// con repetici�n de textura 10x10 para que la textura se repita varias veces.
+	// Aquí dibujamos el suelo usando la función quadtex,
+	// con repetición de textura 10x10 para que la textura se repita varias veces.
 
 	quadtex(v0, v1, v2, v3, 0, 10, 0, 5, 50, 50);
 	glDisable(GL_TEXTURE_2D);
@@ -344,12 +349,109 @@ void Entorno::dibujarSueloCheckerboard()
 	glPopAttrib();
 }
 
+void Entorno::drawFaro(int tiempo_transcurrido) {
+	glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT | GL_TEXTURE_BIT);
+	glPushMatrix();
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT2);
+	glEnable(GL_LIGHT3);
+
+	// Colores comunes para las dos luces móviles
+	GLfloat light_diffuse[] = { 1.0f, 0.9f, 0.7f, 1.0f };
+	GLfloat light_ambient[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+	GLfloat light_specular[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+
+	// Base del faro (no rota)
+	drawcilindro(cb::Vec3(0, 0, 12.5f), 0.5f, 0.5f, 1.0f, textura_pilar);
+	drawcilindro(cb::Vec3(0, 1.0f, 12.5f), 0.5f, 1.0f, 0.5f, textura_pilar);
+	drawcilindro(cb::Vec3(0, 1.5f, 12.5f), 1.0f, 0.5f, 0.0f, textura_techo);
+	drawcilindro(cb::Vec3(0, 1.5f, 12.5f), 0.5f, 0.5f, 1.0f, textura_pilar);
+	drawcilindro(cb::Vec3(0, 2.5f, 12.5f), 0.5f, 1.0f, 0.0f, textura_techo);
+	drawcilindro(cb::Vec3(0, 2.5f, 12.5f), 1.0f, 0.5f, 0.5f, textura_pilar);
+
+	// Tiempo y ángulo
+	using namespace std::chrono;
+	auto ahora = system_clock::now();
+	auto duracion = ahora.time_since_epoch();
+	auto ms = duration_cast<milliseconds>(duracion).count();
+	float segundos_flotante = (ms % 60000) / 1000.0f;
+	float angulo = fmod(segundos_flotante * 120.0f, 360.0f); // 120°/s → rotación cada 3s
+
+	// Parte giratoria
+	glPushMatrix();
+	glTranslated(0.0f, 1.5f, 12.5f); // Subimos al nivel giratorio
+	glRotatef(angulo, 0.0f, 1.0f, 0.0f); // Rotación
+	glTranslated(0.0f, 0.0f, 0.80f); // Colocamos los focos
+
+	// Definir las luces aquí para que se muevan con el faro
+	GLfloat light2_pos[] = { -0.0f, 0.50f, -0.20f, 0.0f }; // Delante
+	GLfloat light3_pos[] = { -0.0f, 0.50f, 1.20f, 0.0f }; // Detrás
+
+
+	glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT2, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT2, GL_SPECULAR, light_specular);
+	glLightfv(GL_LIGHT2, GL_POSITION, light2_pos);
+	
+
+	glLightfv(GL_LIGHT3, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT3, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT3, GL_SPECULAR, light_specular);
+	glLightfv(GL_LIGHT3, GL_POSITION, light3_pos);
+
+
+	//cambia cada segundo
+	static GLuint texture_foco = rand() % 5;
+
+	// Focos giratorios
+	drawcilindro(cb::Vec3(0, 100, 0), 0.1f, 0.1f, 1.0f, ((((ms)/ 3000)) % 4)+1);
+	glTranslated(0.0f, 0.0f, -1.60f);
+	drawcilindro(cb::Vec3(0, 100, 0), 0.1f, 0.1f, 1.0f, (((ms-1500)/3000) % 4)+1);
+
+	glPopMatrix(); // Salimos de la parte giratoria
+	glPopMatrix();
+	glPopAttrib();
+}
+
+void Entorno::drawcilindro(cb::Vec3 pos_base, GLfloat rad, GLfloat rad_2, GLfloat altura, GLuint texture) {
+	glPushMatrix();
+	if (pos_base.y == 100) {
+		//printf("Posicion del cilindro: %f, %f, %f\n", pos_base.x, pos_base.y, pos_base.z);
+	}
+	else {
+		glTranslated(pos_base.x, pos_base.y, pos_base.z);
+	}
+	//calcula los puntos de la base
+	vector<pair<cb::Vec3, cb::Vec3>> puntos_cilindro;
+	for (int i = 0; i <= 360; i += 10) {
+		float angulo = rad(i);
+		float x = rad * cos(angulo);
+		float z = rad * sin(angulo);
+		float x_2 = rad_2 * cos(angulo);
+		float z_2 = rad_2 * sin(angulo);
+		
+		puntos_cilindro.push_back({ cb::Vec3(x, 0, z), cb::Vec3(x_2, altura, z_2) });	
+	}
+	// Dibuja las caras laterales del cilindro
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	for (size_t i = 0; i < puntos_cilindro.size(); ++i) {
+		cb::Vec3 base1 = puntos_cilindro[i].first;
+		cb::Vec3 base2 = puntos_cilindro[(i + 1) % puntos_cilindro.size()].first;
+		cb::Vec3 cima1 = puntos_cilindro[i].second;
+		cb::Vec3 cima2 = puntos_cilindro[(i + 1) % puntos_cilindro.size()].second;
+		cb::quadtex(base1, cima1, cima2, base2, 0, 1.0f, 0, 0.125f, 1, 11);
+	}
+	glPopMatrix();
+}
 
 Vec3 Entorno::pasapuertas(const AABB caja) const {
 	for (const auto& portal_ : portales) {
 		if (caja.colisionaCon(portal_.caja)) {
 			//printf("Colision con portal detectada. Posicion de salida: %f, %f, %f\n", portal_.salida.x, portal_.salida.y, portal_.salida.z);
-			// Si colisiona con el portal, devuelve la posici�n de destino
+			// Si colisiona con el portal, devuelve la posición de destino
 			return portal_.salida;
 		}
 		//printf("No colision con portal detectada entre caja %f/%f %f/%f y caja portal %f/%f %f/%f\n",
